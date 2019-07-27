@@ -16,7 +16,11 @@ function SlotController(){
             throw new Error('[error] arguments of pin invalid');
         }
         let outin = direction === 'in' ? gpio.DIRECTION.IN : gpio.DIRECTION.OUT;
-        const pin = gpio.export(pinNum, {direction: outin,interval: 500});
+        let config = {direction: outin,interval: 500};
+        if(callback && typeof callback === 'function'){
+            config.ready = callback;
+        }
+        const pin = gpio.export(pinNum, config);
         slotMap[pinNum] = pin;
         return pin;
     };

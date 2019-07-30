@@ -14,8 +14,8 @@ const sensor1 = slotController.registryPin(22,'in',(val)=>{
     isDry = sensor1.value ? true : false;
 });
 
-slot1.reset();
-slot2.reset();
+slot1.set(0);
+slot2.set(0);
 
 
 sensor1.on('change',(value)=>{
@@ -32,8 +32,8 @@ app.post('/api/water', (req, res) => {
     slot1.set();
     slot2.set();
     setTimeout(()=>{
-        slot1.reset();
-        slot2.reset();
+        slot1.set(0);
+        slot2.set(0);
         res.sendStatus(200);
     },time)
 });

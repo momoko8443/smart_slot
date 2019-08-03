@@ -7,6 +7,7 @@ app.use(bodyParser.json());
 app.use(express.static('public'))
 
 let isDry = false;
+let isLight = false;
 let isSmart = false;
 const slot1 = slotController.registryPin(17,'out');
 const slot2 = slotController.registryPin(27,'out');
@@ -15,8 +16,8 @@ const sensor1 = slotController.registryPin(22,'in',(val)=>{
     isDry = sensor1.value ? true : false;
 });
 
-slot1.set(0);
-slot2.set(0);
+slot1.set(0); //pump
+slot2.set(0); //light
 
 
 sensor1.on('change',(value)=>{
@@ -26,24 +27,34 @@ sensor1.on('change',(value)=>{
     if(slot1.value && isSmart && !isDry){
         slot1.set(0);
     }
-    if(slot2.value && isSmart && !isDry){
-        slot2.set(0);
-    }
-
 });
 
 app.get('/api/water',(req, res)=>{
     res.send({'dry': isDry});
 });
+
+app.get('/api/light',(req, res)=>{
+    isLight = slot2.value ? true : false;
+    res.send({'light': isLight});
+});
+
+app.post('/api/light', (req, res)=>{
+    isLight = req.body.light;
+    if(isLight){
+        slot2.set(1);
+    }else{
+        slot2.set(0);
+    }
+    res.send({light: isLight});
+})
+
 app.post('/api/water', (req, res) => {
     const time = Number.parseInt(req.body.seconds) * 1000;
     isSmart = req.body.smartMode;
     slot1.set();
-    slot2.set();
     setTimeout(()=>{
         slot1.set(0);
-        slot2.set(0);
-        res.sendStatus(200);
+        res.send({dry: isDry});
     },time);
 });
 

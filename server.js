@@ -71,7 +71,7 @@ app.post('/api/camera', (req, res) => {
 					console.log('open sh');
 					setTimeout(()=>{
 						res.send({camera: true})
-					},5000);
+					},3000);
 				});
 
             }else{

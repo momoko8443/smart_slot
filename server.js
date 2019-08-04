@@ -111,8 +111,8 @@ function portIsOccupied(port) {
             server.close();
             resolve(false);
         })
-        server.on('error',  (err) {
-            if (err.code === 'EADDRINUSE') => {
+        server.on('error',  (err)=> {
+            if (err.code === 'EADDRINUSE'){
                 resolve(true);
             }else{
                 reject(err);

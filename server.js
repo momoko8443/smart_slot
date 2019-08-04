@@ -53,20 +53,40 @@ app.get('/api/camera', (req, res) => {
 
 app.post('/api/camera', (req, res) => {
     let isCamera = req.body.camera;
+	console.log('want to Camera open?', isCamera);
     portIsOccupied(8082).then((result)=>{
+	   console.log('8082 is occupied?', result);
        if(result !== isCamera){
             if(isCamera){
                 exec('sh ./camera/start.sh', (err, stdout, stderr)=>{
-                    if(!err){
+                    /*if(err){
+						console.log('exec open py',err);
+						res.send({camera: false});
+					}
+					else{
+						console.log(stdout);
                         res.send({camera: true});
-                    }
-                })
+                    }*/
+                }).on('exit',()=>{
+					console.log('open sh');
+					setTimeout(()=>{
+						res.send({camera: true})
+					},5000);
+				});
+
             }else{
                 exec('sh ./camera/stop.sh', (err, stdout, stderr)=>{
-                    if(!err){
+					/*if(err){
+						console.log('close camera py', err);
+						res.send({camera:false});
+					}
+					else{
                         res.send({camera: false});
-                    }
-                })
+                    }*/
+                }).on('exit',()=>{
+					console.log('close sh');
+					res.send({camera: false});
+				});
             }
        }else{
         res.send({camera: isCamera});
@@ -100,10 +120,6 @@ app.post('/api/water', (req, res) => {
 
 app.listen(3000, () => console.log('Example app listening on port 3000!'));
 
-
-
-
-
 function portIsOccupied(port) {
     return new Promise( (resolve, reject)=>{
         let server = net.createServer().listen(port);
@@ -118,8 +134,5 @@ function portIsOccupied(port) {
                 reject(err);
             }
         })
-    })
-    
-
-    
+    }); 
 }

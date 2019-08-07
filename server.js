@@ -33,6 +33,7 @@ sensor1.on('change', (value) => {
 });
 
 app.get('/api/water', (req, res) => {
+    isDry = sensor1.value ? true : false;
     res.send({
         'dry': isDry
     });
@@ -110,12 +111,19 @@ app.post('/api/water', (req, res) => {
     const time = Number.parseInt(req.body.seconds) * 1000;
     isSmart = req.body.smartMode;
     slot1.set();
-    setTimeout(() => {
-        slot1.set(0);
-        res.send({
-            dry: isDry
-        });
-    }, time);
+    let timer = setInterval(()=>{
+        if(time <= 0){
+            slot1.set(0);
+            clearInterval(timer);
+            res.send({dry: isDry});
+        }
+        else if(isSmart && !isDry){
+            slot1.set(0);
+            clearInterval(timer);
+            res.send({dry: isDry});
+        }
+        time -= 500;
+    }, 500);
 });
 
 app.listen(3000, () => console.log('Example app listening on port 3000!'));
